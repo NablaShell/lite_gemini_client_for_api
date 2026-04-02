@@ -28,7 +28,7 @@ if not API_KEY:
     raise ValueError("GEMINI_API_KEY not found")
 
 client = genai.Client(api_key=API_KEY)
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.1-flash-lite-preview"
 
 # Database setup
 DB_PATH = os.getenv("DB_PATH", "chat_history.db")
