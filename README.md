@@ -1,136 +1,165 @@
-# Gemini 2.5 Flash Local Client
+# Gemini 3.1 Flash Lite Local Client
 
-Локальный клиент для общения с Gemini 2.5 Flash через API. Минимум зависимостей, максимум производительности.
+A lightweight, self-hosted client for Google's Gemini 3.1 Flash Lite API. No heavy JS dependencies, full chat history, and Docker-ready.
 
-## Зачем это, если есть web-версия?
+## Why this instead of web version?
 
-Потому что `gemini.google.com`:
-- 🐌 Подтягивает **мегабайты JS** и тяжёлых зависимостей
-- 📡 Грузит интернет даже при простом чате
-- 🎨 Ограничен дизайном Google без возможности кастомизации
+Because `gemini.google.com`:
+- 🐌 Loads **megabytes of JavaScript** and heavy dependencies
+- 📡 Wastes bandwidth even for simple chats
+- 🎨 Locked into Google's design with zero customization
 
-**Мой клиент:**
-- ⚡ **Лёгкий** — минимум кода, нет лишних зависимостей
-- 🔓 **Open Source** — полный контроль над кодом
-- 🎨 **Полная кастомизация** — меняй что хочешь (тему, поведение, функции)
-- 🐳 **Docker ready** — работает одинаково на всех системах
-- 💨 **Быстрый** — отвечает моментально, без тормозов
+**This client:**
+- ⚡ **Lightweight** — minimal code, no bloat
+- 🔓 **Open Source** — full control over everything
+- 🎨 **Fully customizable** — change themes, behavior, features
+- 🐳 **Docker ready** — runs the same on any system
+- 💾 **Chat history** — SQLite database with conversation management
+- 💨 **Fast** — instant responses, no lag
 
-## Быстрый старт
+## Quick Start
 
-### 1. Получи API ключ
-- Перейди на https://aistudio.google.com/app/apikey
-- Нажми "Create API Key"
-- Скопируй ключ
+### 1. Get an API Key
+- Go to https://aistudio.google.com/app/apikey
+- Click "Create API Key"
+- Copy your key
 
-### 2. Настрой ключ
-Создай файл `.env` в корне проекта:
+### 2. Configure the key
+Create a `.env` file:
+```env
+GEMINI_API_KEY=your_key_here
+```
+3. Run with Docker (recommended)
+```bash
 
-GEMINI_API_KEY=твой_ключ_сюда
-
-###3. Запуск через Docker (рекомендуется)
-
-# Сборка и запуск
+# Build and start
 docker compose up -d
-
-# Открыть в браузере
+```
+# Open in browser
 http://localhost:8000
 
-Или без Docker (для разработки)
-bash
+Or run without Docker (for development)
+```bash
 
-# Установка зависимостей
+# Install dependencies
 pip install -r requirements.txt
 
-# Запуск
+# Run server
 python backend.py
+```
 
-##Команды Docker
-bash
+Features
 
-# Остановить контейнер
+    🤖 Gemini 3.1 Flash Lite — 500 RPD, 250K token context
+
+    💬 Chat history — all conversations saved in SQLite
+
+    📁 Conversation management — create, switch, delete dialogs
+
+    🎨 Markdown support — code blocks, bold, italic
+
+    🐳 Docker & volume — persistent storage
+
+    🌙 Dark theme — easy on the eyes
+
+    ⚡ Fast & lightweight — no framework bloat
+
+Docker Commands
+```bash
+
+# Start container
+docker compose up -d
+
+# Stop container
 docker compose down
 
-# Посмотреть логи (Ctrl+C для выхода)
+# View logs
 docker compose logs -f
 
-# Перезапустить
+# Restart
 docker compose restart
 
-# Полностью удалить (с томами)
+# Complete cleanup (with volumes)
 docker compose down -v
 
-# Пересобрать образ
+# Rebuild image
 docker compose build --no-cache
+```
 
-Проверка работы
+API Endpoints
+Method	Endpoint	Description
+POST	/api/chat	Send message to Gemini
+GET	/api/conversations	List all conversations
+GET	/api/conversations/{id}/messages	Get messages from conversation
+DELETE	/api/conversations/{id}	Delete conversation
+GET	/api/health	Health check
 
-    Открой http://localhost:8000 в браузере
+Example API call
+```bash
 
-    В правом нижнем углу должен быть зелёный статус "✅ Gemini 2.5 Flash готов"
-
-    Задай любой вопрос в чат
-
-    Наслаждайся быстрыми ответами без лагов
-
-###Устранение проблем
-##Проблема  - Решение
-#404 ошибка - Проверь имя модели в backend.py (должно быть gemini-2.5-flash)
-#Нет ответа - ошибка API	Проверь API ключ в файле .env
-#Порт 8000 уже занят - Измени порт в docker-compose.yml и backend.py
-#Docker не найден - Установи Docker: https://docs.docker.com/get-docker/
-#Китай/Россия блокируют API - Используй VPN или прокси
-
-###Кастомизация
-
-Хочешь изменить внешний вид или добавить фичи?
-
--    CSS стили — редактируй static/style.css
-
--    Поведение чата — правь static/script.js
-
--    Логика бэкенда — меняй backend.py
-
--    Добавить историю чата — допиши SQLite в бэкенд
-
--    Голосовой ввод — добавь Web Speech API
-
-Ограничений нет — это же твой локальный клиент! 🔧
-###Структура проекта
-
+curl -X POST http://localhost:8000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Hello, Gemini!"}'
+```
+Troubleshooting
+Problem	Solution
+404 error	Check model name in backend.py (should be gemini-3.1-flash-lite)
+No response / API error	Check API key in .env file
+Port 8000 already in use	Change port in docker-compose.yml and backend.py
+Docker not found	Install Docker: https://docs.docker.com/get-docker/
+Permission denied on /data	Run mkdir -p data && chmod 755 data
+Container name conflict	Run docker rm -f gemini-flash-client then docker compose up -d
+Project Structure
+```text
 
 gemini-client/
-├── backend.py          # FastAPI сервер
-├── requirements.txt    # Python зависимости
-├── Dockerfile          # Docker образ
-├── docker-compose.yml  # Оркестрация
-├── .env               # API ключ (твой, не в репозиторий)
-├── .dockerignore      # Что исключить из Docker
-└── static/            # Фронтенд
-    ├── index.html     # Главная страница
-    ├── style.css      # Стили (темная тема)
-    └── script.js      # Клиентская логика
+├── backend.py          # FastAPI server with Gemini integration
+├── requirements.txt    # Python dependencies
+├── Dockerfile          # Docker image definition
+├── docker-compose.yml  # Container orchestration
+├── .env               # API key (your secret, not in repo)
+├── .dockerignore      # Files excluded from Docker
+├── run.sh / run.bat   # Quick start scripts
+└── static/            # Frontend files
+    ├── index.html     # Main page with chat UI
+    └── style.css      # Dark theme styles
+```
+Customization
 
-###Технологии
+Want to change the look or add features?
 
-    Бэкенд: Python 3.12 + FastAPI + google-genai SDK
+    CSS styles — edit static/style.css
 
-    Фронтенд: Чистый HTML/CSS/JS (без фреймворков!)
+    Chat behavior — edit static/script.js
 
-    Контейнеризация: Docker + Docker Compose
+    Backend logic — edit backend.py
 
-    Модель: Gemini 2.5 Flash (самая новая и быстрая)
+    Add search — extend SQLite queries
 
-###Лицензия
+    Export chats — add JSON/Markdown export
 
-MIT — делай что хочешь, копируй, меняй, продавай, встраивай куда угодно.
+    Voice input — add Web Speech API
 
-###Благодарности
+No limits — it's your local client! 🔧
+Tech Stack
 
-    Google за Gemini API
+    Backend: Python 3.12 + FastAPI + google-genai SDK
 
-    Ты за использование и доработку 
+    Frontend: Pure HTML/CSS/JS (no frameworks!)
 
-### Готово! Теперь у тебя есть свой быстрый, лёгкий и полностью контролируемый клиент для Gemini.
+    Database: SQLite (embedded, no extra services)
 
+    Container: Docker + Docker Compose
 
+    Model: Gemini 3.1 Flash Lite (500 RPM, 250K context)
+
+License
+
+MIT — do whatever you want, copy, modify, sell, embed anywhere.
+Credits
+
+    Google for Gemini API
+
+    You for using and improving 🤝
+
+🎉 Ready! You now have your own fast, lightweight, and fully controllable Gemini client.

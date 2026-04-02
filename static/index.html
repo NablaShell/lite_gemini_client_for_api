@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini 2.5 Flash Client</title>
+    <title>Gemini 3.1 Flash Lite Client</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,7 @@
             display: flex;
         }
 
-        /* Sidebar с историей */
+        /* Sidebar with history */
         .sidebar {
             width: 280px;
             background: #111111;
@@ -114,7 +114,7 @@
             opacity: 1;
         }
 
-        /* Основной чат */
+        /* Main chat area */
         .main-chat {
             flex: 1;
             display: flex;
@@ -293,34 +293,34 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h2>💬 Диалоги</h2>
-            <button class="new-chat-btn" onclick="app.newConversation()">+ Новый чат</button>
+            <h2>💬 Conversations</h2>
+            <button class="new-chat-btn" onclick="app.newConversation()">+ New Chat</button>
         </div>
         <div class="conversations-list" id="conversationsList">
             <div class="conversation-item" style="text-align: center; color: #666;">
-                Загрузка...
+                Loading...
             </div>
         </div>
     </div>
 
     <div class="main-chat">
         <div class="chat-header">
-            <h1>🤖 Gemini 2.5 Flash</h1>
+            <h1>🤖 Gemini 3.1 Flash Lite</h1>
             <div class="status">
                 <span class="status-dot"></span>
-                <span id="statusText">Готов</span>
+                <span id="statusText">Ready</span>
             </div>
         </div>
 
         <div class="messages" id="messages">
             <div class="message system">
-                ✨ Выбери диалог из списка или создай новый
+                ✨ Select a conversation or create a new one
             </div>
         </div>
 
         <div class="input-area">
-            <textarea id="userInput" placeholder="Введите сообщение... (Ctrl+Enter для отправки)" rows="3"></textarea>
-            <button id="sendBtn">📤 Отправить</button>
+            <textarea id="userInput" placeholder="Type a message... (Ctrl+Enter to send)" rows="3"></textarea>
+            <button id="sendBtn">📤 Send</button>
         </div>
     </div>
 
@@ -333,30 +333,28 @@
                 try {
                     const response = await fetch('/api/conversations');
                     const data = await response.json();
-                    
-                    // Проверяем что пришел массив
                     const conversations = Array.isArray(data) ? data : [];
                     
                     const container = document.getElementById('conversationsList');
                     if (conversations.length === 0) {
-                        container.innerHTML = '<div class="conversation-item" style="text-align: center; color: #666;">Нет диалогов</div>';
+                        container.innerHTML = '<div class="conversation-item" style="text-align: center; color: #666;">No conversations</div>';
                         return;
                     }
                     
                     container.innerHTML = conversations.map(conv => `
                         <div class="conversation-item ${this.currentConversationId === conv.id ? 'active' : ''}" 
                              onclick="app.loadConversation(${conv.id})">
-                            <div class="conversation-title">${this.escapeHtml(conv.title || 'Новый диалог')}</div>
+                            <div class="conversation-title">${this.escapeHtml(conv.title || 'New conversation')}</div>
                             <div class="conversation-meta">
-                                <span>${conv.message_count || 0} сообщений</span>
+                                <span>${conv.message_count || 0} messages</span>
                                 <button class="delete-conv" onclick="event.stopPropagation(); app.deleteConversation(${conv.id})">🗑</button>
                             </div>
                         </div>
                     `).join('');
                 } catch (err) {
-                    console.error('Ошибка загрузки диалогов:', err);
+                    console.error('Error loading conversations:', err);
                     document.getElementById('conversationsList').innerHTML = 
-                        '<div class="conversation-item" style="text-align: center; color: #ff6666;">❌ Ошибка загрузки</div>';
+                        '<div class="conversation-item" style="text-align: center; color: #ff6666;">❌ Error loading</div>';
                 }
             },
 
@@ -370,7 +368,7 @@
                     
                     const container = document.getElementById('messages');
                     if (!messages || messages.length === 0) {
-                        container.innerHTML = '<div class="message system">💬 Начните диалог</div>';
+                        container.innerHTML = '<div class="message system">💬 Start the conversation</div>';
                     } else {
                         container.innerHTML = messages.map(msg => `
                             <div class="message ${msg.role}">
@@ -380,22 +378,22 @@
                     }
                     this.scrollToBottom();
                 } catch (err) {
-                    console.error('Ошибка загрузки сообщений:', err);
+                    console.error('Error loading messages:', err);
                     document.getElementById('messages').innerHTML = 
-                        '<div class="message system">❌ Ошибка загрузки сообщений</div>';
+                        '<div class="message system">❌ Error loading messages</div>';
                 }
             },
 
             async newConversation() {
                 this.currentConversationId = null;
-                document.getElementById('messages').innerHTML = '<div class="message system">✨ Новый диалог. Напишите что-нибудь...</div>';
+                document.getElementById('messages').innerHTML = '<div class="message system">✨ New conversation. Start typing...</div>';
                 document.getElementById('conversationsList').querySelectorAll('.conversation-item').forEach(el => {
                     el.classList.remove('active');
                 });
             },
 
             async deleteConversation(id) {
-                if (!confirm('Удалить этот диалог?')) return;
+                if (!confirm('Delete this conversation?')) return;
                 
                 await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
                 if (this.currentConversationId === id) {
@@ -409,7 +407,6 @@
                 const text = input.value.trim();
                 if (!text || this.isLoading) return;
                 
-                // Добавляем сообщение пользователя в UI
                 const messagesContainer = document.getElementById('messages');
                 messagesContainer.innerHTML += `<div class="message user">${this.escapeHtml(text)}</div>`;
                 input.value = '';
@@ -418,9 +415,8 @@
                 this.isLoading = true;
                 document.getElementById('sendBtn').disabled = true;
                 
-                // Индикатор загрузки
                 const loadingId = 'loading-' + Date.now();
-                messagesContainer.innerHTML += `<div class="message assistant" id="${loadingId}"><span class="loading"></span> Думаю...</div>`;
+                messagesContainer.innerHTML += `<div class="message assistant" id="${loadingId}"><span class="loading"></span> Thinking...</div>`;
                 this.scrollToBottom();
                 
                 try {
@@ -437,7 +433,7 @@
                     document.getElementById(loadingId)?.remove();
                     
                     if (data.error) {
-                        messagesContainer.innerHTML += `<div class="message system">❌ Ошибка: ${this.escapeHtml(data.error)}</div>`;
+                        messagesContainer.innerHTML += `<div class="message system">❌ Error: ${this.escapeHtml(data.error)}</div>`;
                     } else {
                         messagesContainer.innerHTML += `<div class="message assistant">${this.formatMarkdown(this.escapeHtml(data.response))}</div>`;
                         this.currentConversationId = data.conversation_id;
@@ -448,7 +444,7 @@
                     
                 } catch (err) {
                     document.getElementById(loadingId)?.remove();
-                    messagesContainer.innerHTML += `<div class="message system">❌ Ошибка: ${this.escapeHtml(err.message)}</div>`;
+                    messagesContainer.innerHTML += `<div class="message system">❌ Error: ${this.escapeHtml(err.message)}</div>`;
                 } finally {
                     this.isLoading = false;
                     document.getElementById('sendBtn').disabled = false;
@@ -488,7 +484,7 @@
             }
         };
 
-        // Инициализация
+        // Initialize
         document.getElementById('sendBtn').onclick = () => app.sendMessage();
         document.getElementById('userInput').onkeydown = (e) => {
             if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
