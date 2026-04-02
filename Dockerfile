@@ -10,10 +10,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend.py .
 COPY static ./static
 
+# Создаем директорию для БД с правильными правами
+RUN mkdir -p /data && chmod 777 /data
+
 # Создание непривилегированного пользователя
-RUN useradd -m -u 1000 gemini && chown -R gemini:gemini /app
+RUN useradd -m -u 1000 gemini && chown -R gemini:gemini /app /data
 USER gemini
 
-# Запуск
 EXPOSE 8000
 CMD ["python", "backend.py"]
